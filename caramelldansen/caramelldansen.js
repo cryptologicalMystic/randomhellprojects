@@ -5,13 +5,14 @@ let xspeed = 3.5;
 let yspeed = 3.5;
 let xdir, ydir;
 let randhue;
-// let bridge;
-// let song;
+let bridge;
+let chorus;
+let bridgeDone = false;
 
 function preload() {
   img = loadImage('https://i.imgur.com/vKC0A5x.png');
-  // bridge = loadSound('bridge.wav');
-  // song = loadSound();
+  bridge = loadSound('bridge.wav');
+  chorus = loadSound('chorus.wav');
 }
 
 function setup() {
@@ -26,9 +27,15 @@ function setup() {
   xdir = random();
   ydir = random();
   randhue = random(0, 360);
+  bridge.play();
 }
 
 function draw() {
+  if (bridge.isPlaying() == false && bridgeDone == false) {
+    chorus.setLoop();
+    bridgeDone = true;
+  }
+  
   if (frameCount % 24 == 0) {
     randhue = random(0, 360);
   }
