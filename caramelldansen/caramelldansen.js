@@ -28,14 +28,10 @@ function setup() {
   ydir = random();
   randhue = random(0, 360);
   bridge.play();
+  chorus.loop(bridge.duration())
 }
 
-function draw() {
-  if (bridge.isPlaying() == false && bridgeDone == false) {
-    chorus.setLoop();
-    bridgeDone = true;
-  }
-  
+function draw() {  
   if (frameCount % 24 == 0) {
     randhue = random(0, 360);
   }
