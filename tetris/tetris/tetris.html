@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<script type="text/javascript" src="tetris.js"></script>
+	<link rel="stylesheet" type="text/css" href="tetris.css">
+</head>
+<body onload="initializeBoards()">
+	<div class="all">
+		<div id="display">
+			<table id="board">
+				
+			</table>
+			<div id="nextdiv">
+				<p class="nbheader">Next</p>
+				<div class="nbtable" id="nextup">
+					
+				</div>
+				<p class="nbheader">Switch</p>
+				<div class="nbtable">
+					<table id="switch"></table>
+				</div>
+				<p class="nbheader">Score</p>
+				<p id="numLines" class="scoreNum">Lines<br>0</p>
+				<p id="numLevel" class="scoreNum">Level<br>1</p>
+			</div>
+		</div>
+		<div id="buttonrow">
+			<input type="button" name="start" onclick="startGame()" value="Start Game">
+			<input type="button" name="playpause" onclick="pauseGame()" value="Play/Pause">
+			<input type="button" name="soundtoggle" id="soundtoggle" onclick="toggleSound()" value="Mute">
+		</div>
+	</div>
+
+</body>
+</html>

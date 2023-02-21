@@ -1,0 +1,88 @@
+tr.mboard {
+	border: 1px solid black;
+	padding: 6px;
+}
+
+tr.nboard {
+	border: 1px solid black;
+	padding: 4px;
+}
+
+th {
+	text-align: center;
+}
+
+/*table {
+	float: left;
+}*/
+
+div.all {
+	margin: auto;
+	width: min-content;
+
+}
+
+div#display {
+	display: flex;
+}
+
+#nextdiv {
+	float: left;
+	margin: 5px;
+}
+
+#board {
+	float: left;
+	border: 1px solid black;
+	padding: 5px;
+	margin: 5px;
+}
+
+div#buttonrow {
+	float: none;
+	clear: left;
+	text-align: center;
+	padding-top: 5px;
+}
+
+td {
+	border: inherit;
+	padding: inherit;
+}
+
+.nbheader {
+	/*float: left;*/
+	border: 1px solid black;
+	text-align: center;
+	margin: auto;
+	padding: 2px;
+}
+
+.scoreNum {
+	/*float: left;*/
+	/*border: 1px solid black;*/
+	text-align: center;
+	margin: auto;
+	padding: 5px;
+}
+
+.nbtable {
+	margin: 5px;
+}
+
+.on {
+	background-color: black;
+}
+
+.off {
+	background-color: white;
+}
+
+#r0, #r2, #r4, #r6 {
+	border: 1px solid red !important;
+}
+
+* {
+	font-family: monospace;
+	box-sizing: border-box;
+}
