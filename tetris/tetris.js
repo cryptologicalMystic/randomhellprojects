@@ -28,7 +28,6 @@ let hadtomove;
 let sbHolder;
 let hasSwitched = false;
 let doPanic;
-let isSoundEnabled = true;
 
 let keyL = "ArrowLeft";
 let keyR = "ArrowRight";
@@ -36,12 +35,6 @@ let keyD = "ArrowDown";
 let keyCW = "x";
 let keyWS = "z";
 let keyS = "s";
-
-let soundRotate = new p5.SoundFile("blockrotate.wav");
-let soundSettle = new p5.SoundFile("blocksettle.wav");
-let soundSideMove = new p5.SoundFile("blocksidemove.wav");
-let soundSwitch = new p5.SoundFile("blockswitch.wav");
-let soundLevelUp = new p5.SoundFile("levelup.wav");
 
 function getRandInteger(min, max) {
 	return Math.floor(Math.random() * (max - min) ) + min;
@@ -58,159 +51,6 @@ function checkForTrue(filled) {
 function initializeBoards() {
 	buildBoardHtml();
 	buildNextHtml();
-}
-
-class Block {
-	constructor(btype,x,y,o) {
-		this.shapey = btype;
-		this.orientation = o;
-		this.center = [x,y];
-		if (btype == "t") {
-			this.listofo = [
-				[[-2,0], [0,0], [2,0], [0,2]], // T
-				[[0,-2], [-2,0], [0,0], [0,2]], // + missing right arm
-				[[0,-2], [-2,0], [0,0], [2,0]], // upside down T
-				[[0,-2], [0,0], [2,0], [0,2]], // + missing left arm
-			];
-		} else if (btype == "o") {
-			this.listofo = [
-				[[-1,-1], [-1,1], [1,-1], [1,1]]
-			];
-		} else if (btype == "i") {
-			this.listofo = [
-				[[0,-3], [0,-1], [0,1], [0,3]], // vertical
-				[[-3,0], [-1,0], [1,0], [3,0]] // horizontal
-			];
-		} else if (btype == "l") {
-			this.listofo = [
-				[[-1,-2], [-1,0], [-1,2], [1,2]], // bottom left L
-				[[-2,-1], [0,-1], [2,-1], [-2,1]], // top left L
-				[[-1,-2], [1,-2], [1,0], [1,2]], // top right L
-				[[2,-1], [-2,1], [0,1], [2,1]] // bottom right L
-			];
-		} else if (btype == "j") {
-			this.listofo = [
-				[[1,-2], [1,0], [1,2], [-1,2]], // bottom right J
-				[[2,-1], [-0,-1], [-2,-1], [2,1]], // top right J
-				[[1,-2], [-1,-2], [-1,0], [-1,2]], // top left J
-				[[-2,-1], [2,1], [-0,1], [-2,1]] // bottom left J
-			];
-		} else if (btype == "s") {
-			this.listofo = [
-				[[0,-1], [2,-1], [-2,1], [0,1]], // S r-l
-				[[-1,-2], [-1,0], [1,0], [1,2]] // S u-d
-			];
-		} else if (btype == "z") {
-			this.listofo = [
-				[[0,-1], [-2,-1], [2,1], [0,1]], // S r-l
-				[[1,-2], [1,0], [-1,0], [-1,2]] // S u-d
-			];
-		}
-		this.innerblocks = [];
-		this.ibcurrent = [];
-		// this.ibsbycoord = [[], []];
-		for (var i = 0; i < this.listofo[o].length; i++) {
-			this.innerblocks.push([this.listofo[o][i][0], this.listofo[o][i][1]]);
-			this.ibcurrent.push([(this.innerblocks[i][0] + this.center[0]), (this.innerblocks[i][1] + this.center[1])]);
-			// this.ibsbycoord[0].push(this.ibcurrent[i][0]);
-			// this.ibsbycoord[1].push(this.ibcurrent[i][1]);
-		}
-	}
-
-	newPosition = () => {
-		this.innerblocks.length = 0;
-		this.ibcurrent.length = 0;
-		// this.ibsbycoord[0].length = 0;
-		// this.ibsbycoord[1].length = 0;
-		for (var i = 0; i < this.listofo[this.orientation].length; i++) {
-			this.innerblocks.push([this.listofo[this.orientation][i][0], this.listofo[this.orientation][i][1]]);
-			this.ibcurrent.push([(this.innerblocks[i][0] + this.center[0]), (this.innerblocks[i][1] + this.center[1])]);
-			// this.ibsbycoord[0].push(this.ibcurrent[i][0]);
-			// this.ibsbycoord[1].push(this.ibcurrent[i][1]);
-		}
-	}
-
-	removeOffset = () => {
-		// if ((this.ibsbycoord[0].find(isEven) == undefined) && (Math.abs(this.center[0]) % 2 == 0)) {
-		// 	this.center[0]--;
-		// 	hadtomove = true;
-		// } else if ((this.ibsbycoord[0].find(isEven) != undefined) && (Math.abs(this.center[0]) % 2 == 1)) {
-		// 	this.center[0]++;
-		// 	hadtomove = true;
-		// }
-		// if ((this.ibsbycoord[1].find(isEven) == undefined) && (Math.abs(this.center[1]) % 2 == 0)) {
-		// 	this.center[1]--;
-		// 	hadtomove = true;
-		// } else if ((this.ibsbycoord[1].find(isEven) != undefined) && (Math.abs(this.center[1]) % 2 == 1)) {
-		// 	this.center[1]++;
-		// 	hadtomove = true;
-		// }
-		if ((this.innerblocks[0][0] + Math.abs(this.center[0])) % 2 != 0) {
-			if (this.innerblocks[0][0] % 2 != 0) {
-				this.center[0]--;
-			} else if (Math.abs(this.center[0]) % 2 != 0) {
-				this.center[0]++;
-			}
-			hadtomove = true;
-		}
-		if ((this.innerblocks[0][1] + Math.abs(this.center[1])) % 2 != 0) {
-			if (this.innerblocks[0][1] % 2 != 0) {
-				this.center[1]--;
-			} else if (Math.abs(this.center[1]) % 2 != 0) {
-				this.center[1]++;
-			}
-			hadtomove = true;
-		}
-		if (hadtomove == true) {
-			this.newPosition();
-			hadtomove = undefined;
-		} else {
-			hadtomove = undefined;
-		}
-	}
-
-	rotate = (d) => {
-		// console.log(this);
-		if (d == "clockwise") {
-			this.innerblocks.length = 0;
-			this.ibcurrent.length = 0;
-			this.orientation++;
-			this.orientation = this.orientation % (this.listofo.length);
-			this.newPosition();
-		} else if (d == "counterclockwise") {
-			this.innerblocks.length = 0;
-			this.ibcurrent.length = 0;
-			this.orientation += (this.listofo.length - 1);
-			this.orientation = this.orientation % (this.listofo.length);
-			this.newPosition();
-		}
-		if (isSoundEnabled) {
-			soundRotate.play();
-		}
-		this.removeOffset();
-	}
-
-	moveDown = () => {
-		this.center[1] += 2;
-		this.newPosition();
-	}
-
-	moveSide = (dist) => {
-		this.center[0] += dist;
-		this.newPosition();
-		if (isSoundEnabled) {
-			soundSideMove.play();
-		}
-	}
-
-	settle = () => {
-		for (var i = 0; i < this.ibcurrent.length; i++) {
-			tetrisArray[this.ibcurrent[i][1]][this.ibcurrent[i][0]] = true;
-		}
-		if (isSoundEnabled) {
-			soundSettle.play();
-		}
-	}
 }
 
 function startGame() {
@@ -546,11 +386,176 @@ function decreaseInterval() {
 			levelNumber++;
 			currentReq = Math.round(currentReq * (gRatio + 1));
 		}
-		if (isSoundEnabled) {
-			soundLevelUp.play();
-		}
 		gameInterval = new RecurringTimer(() => {moveDownTest(currentBlock)},intervalRate);
 		document.getElementById("numLevel").innerHTML = "Level<br>" + levelNumber;
+	}
+}
+
+// function testDraw(obj) {
+// 	for (var i = 0; i < boardHeight * 2; i+=2) {
+// 		for (var j = 0; j < boardWidth * 2; j+=2) {
+// 			tetrisArray[i][j] = false;
+// 			document.getElementById(j + "-" + i).classList.toggle("on",false);
+// 		}
+// 	}
+// 	for (var i = 0; i < obj.ibcurrent.length; i++) {
+// 		document.getElementById(obj.ibcurrent[i][0] + "-" + obj.ibcurrent[i][1]).classList.toggle("on",true);
+// 	}
+// }
+
+// function testSetup(btype,x,y,o) {
+// 	foo = new Block(btype,x,y,o);
+// 	testDraw(foo);
+// 	console.log(foo);
+// }
+
+// function testRotate(test,d) {
+// 	test.rotate(d);
+// 	testDraw(test);
+// }
+
+class Block {
+	constructor(btype,x,y,o) {
+		this.shapey = btype;
+		this.orientation = o;
+		this.center = [x,y];
+		if (btype == "t") {
+			this.listofo = [
+				[[-2,0], [0,0], [2,0], [0,2]], // T
+				[[0,-2], [-2,0], [0,0], [0,2]], // + missing right arm
+				[[0,-2], [-2,0], [0,0], [2,0]], // upside down T
+				[[0,-2], [0,0], [2,0], [0,2]], // + missing left arm
+			];
+		} else if (btype == "o") {
+			this.listofo = [
+				[[-1,-1], [-1,1], [1,-1], [1,1]]
+			];
+		} else if (btype == "i") {
+			this.listofo = [
+				[[0,-3], [0,-1], [0,1], [0,3]], // vertical
+				[[-3,0], [-1,0], [1,0], [3,0]] // horizontal
+			];
+		} else if (btype == "l") {
+			this.listofo = [
+				[[-1,-2], [-1,0], [-1,2], [1,2]], // bottom left L
+				[[-2,-1], [0,-1], [2,-1], [-2,1]], // top left L
+				[[-1,-2], [1,-2], [1,0], [1,2]], // top right L
+				[[2,-1], [-2,1], [0,1], [2,1]] // bottom right L
+			];
+		} else if (btype == "j") {
+			this.listofo = [
+				[[1,-2], [1,0], [1,2], [-1,2]], // bottom right J
+				[[2,-1], [-0,-1], [-2,-1], [2,1]], // top right J
+				[[1,-2], [-1,-2], [-1,0], [-1,2]], // top left J
+				[[-2,-1], [2,1], [-0,1], [-2,1]] // bottom left J
+			];
+		} else if (btype == "s") {
+			this.listofo = [
+				[[0,-1], [2,-1], [-2,1], [0,1]], // S r-l
+				[[-1,-2], [-1,0], [1,0], [1,2]] // S u-d
+			];
+		} else if (btype == "z") {
+			this.listofo = [
+				[[0,-1], [-2,-1], [2,1], [0,1]], // S r-l
+				[[1,-2], [1,0], [-1,0], [-1,2]] // S u-d
+			];
+		}
+		this.innerblocks = [];
+		this.ibcurrent = [];
+		// this.ibsbycoord = [[], []];
+		for (var i = 0; i < this.listofo[o].length; i++) {
+			this.innerblocks.push([this.listofo[o][i][0], this.listofo[o][i][1]]);
+			this.ibcurrent.push([(this.innerblocks[i][0] + this.center[0]), (this.innerblocks[i][1] + this.center[1])]);
+			// this.ibsbycoord[0].push(this.ibcurrent[i][0]);
+			// this.ibsbycoord[1].push(this.ibcurrent[i][1]);
+		}
+	}
+
+	newPosition = () => {
+		this.innerblocks.length = 0;
+		this.ibcurrent.length = 0;
+		// this.ibsbycoord[0].length = 0;
+		// this.ibsbycoord[1].length = 0;
+		for (var i = 0; i < this.listofo[this.orientation].length; i++) {
+			this.innerblocks.push([this.listofo[this.orientation][i][0], this.listofo[this.orientation][i][1]]);
+			this.ibcurrent.push([(this.innerblocks[i][0] + this.center[0]), (this.innerblocks[i][1] + this.center[1])]);
+			// this.ibsbycoord[0].push(this.ibcurrent[i][0]);
+			// this.ibsbycoord[1].push(this.ibcurrent[i][1]);
+		}
+	}
+
+	removeOffset = () => {
+		// if ((this.ibsbycoord[0].find(isEven) == undefined) && (Math.abs(this.center[0]) % 2 == 0)) {
+		// 	this.center[0]--;
+		// 	hadtomove = true;
+		// } else if ((this.ibsbycoord[0].find(isEven) != undefined) && (Math.abs(this.center[0]) % 2 == 1)) {
+		// 	this.center[0]++;
+		// 	hadtomove = true;
+		// }
+		// if ((this.ibsbycoord[1].find(isEven) == undefined) && (Math.abs(this.center[1]) % 2 == 0)) {
+		// 	this.center[1]--;
+		// 	hadtomove = true;
+		// } else if ((this.ibsbycoord[1].find(isEven) != undefined) && (Math.abs(this.center[1]) % 2 == 1)) {
+		// 	this.center[1]++;
+		// 	hadtomove = true;
+		// }
+		if ((this.innerblocks[0][0] + Math.abs(this.center[0])) % 2 != 0) {
+			if (this.innerblocks[0][0] % 2 != 0) {
+				this.center[0]--;
+			} else if (Math.abs(this.center[0]) % 2 != 0) {
+				this.center[0]++;
+			}
+			hadtomove = true;
+		}
+		if ((this.innerblocks[0][1] + Math.abs(this.center[1])) % 2 != 0) {
+			if (this.innerblocks[0][1] % 2 != 0) {
+				this.center[1]--;
+			} else if (Math.abs(this.center[1]) % 2 != 0) {
+				this.center[1]++;
+			}
+			hadtomove = true;
+		}
+		if (hadtomove == true) {
+			this.newPosition();
+			hadtomove = undefined;
+		} else {
+			hadtomove = undefined;
+		}
+	}
+
+	rotate = (d) => {
+		// console.log(this);
+		if (d == "clockwise") {
+			this.innerblocks.length = 0;
+			this.ibcurrent.length = 0;
+			this.orientation++;
+			this.orientation = this.orientation % (this.listofo.length);
+			this.newPosition();
+		} else if (d == "counterclockwise") {
+			this.innerblocks.length = 0;
+			this.ibcurrent.length = 0;
+			this.orientation += (this.listofo.length - 1);
+			this.orientation = this.orientation % (this.listofo.length);
+			this.newPosition();
+		}
+		// console.log(this);
+		this.removeOffset();
+	}
+
+	moveDown = () => {
+		this.center[1] += 2;
+		this.newPosition();
+	}
+
+	moveSide = (dist) => {
+		this.center[0] += dist;
+		this.newPosition();
+	}
+
+	settle = () => {
+		for (var i = 0; i < this.ibcurrent.length; i++) {
+			tetrisArray[this.ibcurrent[i][1]][this.ibcurrent[i][0]] = true;
+		}
 	}
 }
 
@@ -653,14 +658,4 @@ function RecurringTimer(callback, delay) { // Modified version of code from Tim 
     this.resume = resume;
 
     this.resume();
-}
-
-function toggleSound() {
-	if (isSoundEnabled) {
-		isSoundEnabled = false;
-		document.getElementById("soundtoggle").getAttributeNode("value").value = "Unmute";
-	} else {
-		isSoundEnabled = true;
-		document.getElementById("soundtoggle").getAttributeNode("value").value = "Mute";
-	}
 }
