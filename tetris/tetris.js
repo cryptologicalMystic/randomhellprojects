@@ -37,51 +37,78 @@ let keyCW = "x";
 let keyWS = "z";
 let keyS = "s";
 
-let soundContext;
-let soundBufferLoader;
+// let soundContext;
+// let soundBufferLoader;
 
-let sSwitch;
-let sRotate;
-let sSettle;
-let sSidemove;
-let sLevelUp;
+let sRotate = new Howl({
+	// src: ['https://cryptologicalmystic.github.io/randomhellprojects/tetris/blockrotate.wav']
+	src: ['blockrotate.wav']
+});
+let sSettle = new Howl({
+	// src: ['https://cryptologicalmystic.github.io/randomhellprojects/tetris/blocksettle.wav']
+	src: ['blocksettle.wav']
+});
+let sSidemove = new Howl({
+	// src: ['https://cryptologicalmystic.github.io/randomhellprojects/tetris/blocksidemove.wav']
+	src: ['blocksidemove.wav']
+});
+let sSwitch = new Howl({
+	// src: ['https://cryptologicalmystic.github.io/randomhellprojects/tetris/blockswitch.wav']
+	src: ['blockswitch.wav']
+});
+let sLevelUp = new Howl({
+	// src: ['https://cryptologicalmystic.github.io/randomhellprojects/tetris/levelup.wav']
+	src: ['levelup.wav']
+});
 
-function initSound() {
-    soundContext = new AudioContext();
+// function initSound() {
+//     soundContext = new AudioContext();
 
-    soundBufferLoader = new BufferLoader(
-    soundContext,
-    [
-        'blockrotate.wav',
-        'blocksettle.wav',
-        'blocksidemove.wav',
-        'blockswitch.wav',
-        'levelup.wav'
-    ],
-    finishedLoading
-    );
+//     // soundBufferLoader = new BufferLoader(
+//     // soundContext,
+//     // [
+//     //     'blockrotate.wav',
+//     //     'blocksettle.wav',
+//     //     'blocksidemove.wav',
+//     //     'blockswitch.wav',
+//     //     'levelup.wav'
+//     // ],
+//     // finishedLoading
+//     // );
 
-    soundBufferLoader.load();
-}
+//     soundBufferLoader = new BufferLoader(
+//     soundContext,
+//     [
+//         'https://cryptologicalmystic.github.io/randomhellprojects/tetris/blockrotate.wav',
+//         'https://cryptologicalmystic.github.io/randomhellprojects/tetris/blocksettle.wav',
+//         'https://cryptologicalmystic.github.io/randomhellprojects/tetris/blocksidemove.wav',
+//         'https://cryptologicalmystic.github.io/randomhellprojects/tetris/blockswitch.wav',
+//         'https://cryptologicalmystic.github.io/randomhellprojects/tetris/levelup.wav'
+//     ],
+//     finishedLoading
+//     );
 
-function finishedLoading(bufferList) {
-    sRotate = soundContext.createBufferSource();
-    sSettle = soundContext.createBufferSource();
-    sSidemove = soundContext.createBufferSource();
-    sSwitch = soundContext.createBufferSource();
-    sLevelUp = soundContext.createBufferSource();
-    sRotate.buffer = bufferList[0];
-    sSettle.buffer = bufferList[1];
-    sSidemove.buffer = bufferList[2];
-    sSwitch.buffer = bufferList[3];
-    sLevelUp.buffer = bufferList[4];
+//     soundBufferLoader.load();
+// }
 
-    sRotate.connect(soundContext.destination);
-    sSettle.connect(soundContext.destination);
-    sSidemove.connect(soundContext.destination);
-    sSwitch.connect(soundContext.destination);
-    sLevelUp.connect(soundContext.destination);
-}
+// function finishedLoading(bufferList) {
+//     sRotate = soundContext.createBufferSource();
+//     sSettle = soundContext.createBufferSource();
+//     sSidemove = soundContext.createBufferSource();
+//     sSwitch = soundContext.createBufferSource();
+//     sLevelUp = soundContext.createBufferSource();
+//     sRotate.buffer = bufferList[0];
+//     sSettle.buffer = bufferList[1];
+//     sSidemove.buffer = bufferList[2];
+//     sSwitch.buffer = bufferList[3];
+//     sLevelUp.buffer = bufferList[4];
+
+//     sRotate.connect(soundContext.destination);
+//     sSettle.connect(soundContext.destination);
+//     sSidemove.connect(soundContext.destination);
+//     sSwitch.connect(soundContext.destination);
+//     sLevelUp.connect(soundContext.destination);
+// }
 
 function getRandInteger(min, max) {
 	return Math.floor(Math.random() * (max - min) ) + min;
@@ -98,7 +125,7 @@ function checkForTrue(filled) {
 function initializeBoards() {
 	buildBoardHtml();
 	buildNextHtml();
-	initSound();
+	// initSound();
 }
 
 function startGame() {
@@ -245,7 +272,8 @@ function moveDownTest(obj) {
 		} else if (testeroni < obj.ibcurrent.length) {
 			obj.settle();
 			if (isSoundEnabled) {
-				sSettle.noteOn(0);
+				// sSettle.noteOn(0);
+				sSettle.play();
 			}
 			testClearLines();
 			let testForForbidden = 0;
@@ -301,7 +329,8 @@ function moveSideTest(obj,dir) {
 		if (testeroni == obj.ibcurrent.length) {
 			obj.moveSide(sidewaysNum);
 			if (isSoundEnabled) {
-				sSidemove.noteOn(0);
+				// sSidemove.noteOn(0);
+				sSidemove.play();
 			}
 			fullDraw();
 			panicWait();
@@ -332,7 +361,8 @@ function rotateTest(obj,dir) {
 		if (testeroni == obj.ibcurrent.length) {
 			obj.rotate(dir);
 			if (isSoundEnabled) {
-				sRotate.noteOn(0);
+				// sRotate.noteOn(0);
+				sRotate.play();
 			}
 			fullDraw();
 			panicWait();
@@ -420,7 +450,8 @@ function switchBlocks() {
 			}
 			hasSwitched = true;
 			if (isSoundEnabled) {
-				sSwitch.noteOn(0);
+				// sSwitch.noteOn(0);
+				sSwitch.play();
 			}
 			panicWait();
 		}
@@ -449,7 +480,8 @@ function decreaseInterval() {
 		gameInterval = new RecurringTimer(() => {moveDownTest(currentBlock)},intervalRate);
 		document.getElementById("numLevel").innerHTML = "Level<br>" + levelNumber;
 		if (isSoundEnabled) {
-			sLevelUp.noteOn(0);
+			// sLevelUp.noteOn(0);
+			sLevelUp.play();
 		}
 	}
 }
