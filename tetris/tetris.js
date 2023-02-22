@@ -23,6 +23,7 @@ let blockSwitch;
 let blockQueue = [];
 let isGamePlaying = false;
 let isGamePaused = false;
+let isSoundEnabled = true;
 let gameInterval;
 let hadtomove;
 let sbHolder;
@@ -35,6 +36,46 @@ let keyD = "ArrowDown";
 let keyCW = "x";
 let keyWS = "z";
 let keyS = "s";
+
+let soundContext;
+let soundBufferLoader;
+
+function initSound() {
+    soundContext = new AudioContext();
+
+    soundBufferLoader = new BufferLoader(
+    soundContext,
+    [
+        'blockrotate.wav',
+        'blocksettle.wav',
+        'blocksidemove.wav',
+        'blockswitch.wav',
+        'levelup.wav'
+    ],
+    finishedLoading
+    );
+
+    soundBufferLoader.load();
+}
+
+function finishedLoading(bufferList) {
+    var sRotate = soundContext.createBufferSource();
+    var sSettle = soundContext.createBufferSource();
+    var sSidemove = soundContext.createBufferSource();
+    var sSwitch = soundContext.createBufferSource();
+    var sLevelUp = soundContext.createBufferSource();
+    sRotate.buffer = bufferList[0];
+    sSettle.buffer = bufferList[1];
+    sSidemove.buffer = bufferList[2];
+    sSwitch.buffer = bufferList[3];
+    sLevelUp.buffer = bufferList[4];
+
+    sRotate.connect(soundContext.destination);
+    sSettle.connect(soundContext.destination);
+    sSidemove.connect(soundContext.destination);
+    sSwitch.connect(soundContext.destination);
+    sLevelUp.connect(soundContext.destination);
+}
 
 function getRandInteger(min, max) {
 	return Math.floor(Math.random() * (max - min) ) + min;
@@ -51,6 +92,7 @@ function checkForTrue(filled) {
 function initializeBoards() {
 	buildBoardHtml();
 	buildNextHtml();
+	initSound();
 }
 
 function startGame() {
@@ -196,6 +238,9 @@ function moveDownTest(obj) {
 			obj.moveDown();
 		} else if (testeroni < obj.ibcurrent.length) {
 			obj.settle();
+			if (isSoundEnabled) {
+				sSettle.noteOn(0);
+			}
 			testClearLines();
 			let testForForbidden = 0;
 			for (var i = 0; i < obj.ibcurrent.length; i++) {
@@ -249,6 +294,9 @@ function moveSideTest(obj,dir) {
 		}
 		if (testeroni == obj.ibcurrent.length) {
 			obj.moveSide(sidewaysNum);
+			if (isSoundEnabled) {
+				sSidemove.noteOn(0);
+			}
 			fullDraw();
 			panicWait();
 		} else if (testeroni < obj.ibcurrent.length) {
@@ -277,6 +325,9 @@ function rotateTest(obj,dir) {
 		}
 		if (testeroni == obj.ibcurrent.length) {
 			obj.rotate(dir);
+			if (isSoundEnabled) {
+				sRotate.noteOn(0);
+			}
 			fullDraw();
 			panicWait();
 		} else if (testeroni < obj.ibcurrent.length) {
@@ -362,8 +413,11 @@ function switchBlocks() {
 				sbHolder = new BlockPreview(blockSwitch.shapey,blockSwitch.orientation);
 			}
 			hasSwitched = true;
+			if (isSoundEnabled) {
+				sSwitch.noteOn(0);
+			}
+			panicWait();
 		}
-		panicWait();
 	}
 }
 
@@ -388,31 +442,11 @@ function decreaseInterval() {
 		}
 		gameInterval = new RecurringTimer(() => {moveDownTest(currentBlock)},intervalRate);
 		document.getElementById("numLevel").innerHTML = "Level<br>" + levelNumber;
+		if (isSoundEnabled) {
+			sLevelUp.noteOn(0);
+		}
 	}
 }
-
-// function testDraw(obj) {
-// 	for (var i = 0; i < boardHeight * 2; i+=2) {
-// 		for (var j = 0; j < boardWidth * 2; j+=2) {
-// 			tetrisArray[i][j] = false;
-// 			document.getElementById(j + "-" + i).classList.toggle("on",false);
-// 		}
-// 	}
-// 	for (var i = 0; i < obj.ibcurrent.length; i++) {
-// 		document.getElementById(obj.ibcurrent[i][0] + "-" + obj.ibcurrent[i][1]).classList.toggle("on",true);
-// 	}
-// }
-
-// function testSetup(btype,x,y,o) {
-// 	foo = new Block(btype,x,y,o);
-// 	testDraw(foo);
-// 	console.log(foo);
-// }
-
-// function testRotate(test,d) {
-// 	test.rotate(d);
-// 	testDraw(test);
-// }
 
 class Block {
 	constructor(btype,x,y,o) {
@@ -658,4 +692,14 @@ function RecurringTimer(callback, delay) { // Modified version of code from Tim 
     this.resume = resume;
 
     this.resume();
+}
+
+function toggleSound() {
+	if (isSoundEnabled) {
+		isSoundEnabled = false;
+		document.getElementById("soundtoggle").getAttributeNode("value").value = "Unmute";
+	} else {
+		isSoundEnabled = true;
+		document.getElementById("soundtoggle").getAttributeNode("value").value = "Mute";
+	}
 }
