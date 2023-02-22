@@ -40,6 +40,12 @@ let keyS = "s";
 let soundContext;
 let soundBufferLoader;
 
+let sSwitch;
+let sRotate;
+let sSettle;
+let sSidemove;
+let sLevelUp;
+
 function initSound() {
     soundContext = new AudioContext();
 
@@ -59,11 +65,11 @@ function initSound() {
 }
 
 function finishedLoading(bufferList) {
-    var sRotate = soundContext.createBufferSource();
-    var sSettle = soundContext.createBufferSource();
-    var sSidemove = soundContext.createBufferSource();
-    var sSwitch = soundContext.createBufferSource();
-    var sLevelUp = soundContext.createBufferSource();
+    sRotate = soundContext.createBufferSource();
+    sSettle = soundContext.createBufferSource();
+    sSidemove = soundContext.createBufferSource();
+    sSwitch = soundContext.createBufferSource();
+    sLevelUp = soundContext.createBufferSource();
     sRotate.buffer = bufferList[0];
     sSettle.buffer = bufferList[1];
     sSidemove.buffer = bufferList[2];
